@@ -24,4 +24,4 @@ if answer == "da":
   st.write('fuck zlati')
 else:
   sr.warning('no such answer aloud')
-  break
+ 
