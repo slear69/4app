@@ -23,5 +23,5 @@ if answer == "da":
   st.success('peak python the best')
   st.write('fuck zlati')
 else:
-  sr.warning('no such answer aloud')
+  st.warning('no such answer aloud')
  
