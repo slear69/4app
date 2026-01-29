@@ -13,8 +13,10 @@ st.title("godini")
 if age >= 18:
   st.success('ти си пулнолетен')
   st.write('ти си на',age,'заповядаи в p didy party')
-else:
+elif age < 18:
   st.warning('няма да отивам в затвора')
+else :
+  st.write('come to pi didi ')
 
 st.title("da / ne")
 answer = st.radio("обичаш ли програмиранет ",("да","не"))
