@@ -14,7 +14,7 @@ if answer >= 64:
   st.success('правилно :D 1 т.')
   point = point + 1
 elif answer != 64:
-  st.warning('грешен отговор 0 т. >:(')
+  st.error('грешен отговор 0 т. >:(')
 
 st.title("da / ne")
 answer = st.radio("обичаш ли програмиранет ",("да","не"))
