@@ -15,8 +15,8 @@ if answer >= 64:
   point = point + 1
 elif answer != 64:
   st.error('грешен отговор 0 т. >:(')
-else:
-  sr.warning("няма отговор")
+elif:
+  sr.warning("ваведи тук")
 
 st.title("da / ne")
 answer = st.radio("обичаш ли програмиранет ",("да","не"))
