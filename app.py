@@ -1,18 +1,18 @@
 import streamlit as st
 
-st.title("zdravei")
+st.title("zdravei test po mat")
 age = st.number_input("ваведи години",min_value=0 , max_value=120)
 name = st.text_input("ваведи име")
-
+point= 0 
 if st.button("краи"):
   st.success('готово')
   st.write("ти си",name,"на",age)
 
-st.title("godini")
-
-if age >= 18:
-  st.success('ти си пулнолетен')
-  st.write('ти си на',age,'заповядаи в p didy party')
+st.title("1 задача - 1т.")
+answer=st.number_input("колко е 4^3")
+if answer >= 64:
+  st.success('правилно :D 1 т.')
+  point = point + 1
 elif age < 18:
   st.warning('няма да отивам в затвора')
 else :
