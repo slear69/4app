@@ -9,21 +9,16 @@ if st.button("краи"):
   st.write("ти си",name,"на",age)
 
 st.title("1 задача - 1т.")
-answer=st.number_input("колко е 4^3")
+answere=st.number_input("колко е 4^3")
 if st.button('предаи'):
-    if answer >= 64:
+    if answere >= 64:
        st.success('правилно :D 1 т.')
        point = point + 1
-    elif answer != 64:
-       st.error('грешен отговор 0 т. >:(')
-
-
     st.title("da / ne - 1т.")
     answer = st.radio("молната маса равна ли е на Mm = m/n ",("да","не"))
-
     if answer == "да":
        st.success('браво 1т.')
        point = point + 1
     else:
-       st.warning('грешно')
+       st.warning('грешно имаш',point)
  
