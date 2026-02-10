@@ -18,12 +18,12 @@ if st.button('предаи'):
        st.error('грешен отговор 0 т. >:(')
 
 
-st.title("da / ne")
-answer = st.radio("обичаш ли програмиранет ",("да","не"))
+    st.title("da / ne - 1т.")
+    answer = st.radio("молната маса равна ли е на Mm = m/n ",("да","не"))
 
-if answer == "да":
-  st.success('peak python the best')
-  st.write('fuck zlati')
-else:
-  st.warning('no such answer aloud')
+    if answer == "да":
+       st.success('браво 1т.')
+       point = point + 1
+    else:
+       st.warning('грешно')
  
