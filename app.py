@@ -15,7 +15,7 @@ if answer >= 64:
   point = point + 1
 elif answer != 64:
   st.error('грешен отговор 0 т. >:(')
-elif:
+elif answer = 0:
   sr.warning("ваведи тук")
 
 st.title("da / ne")
