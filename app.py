@@ -21,7 +21,7 @@ else :
 st.title("da / ne")
 answer = st.radio("обичаш ли програмиранет ",("да","не"))
 
-if answer == "da":
+if answer == "да":
   st.success('peak python the best')
   st.write('fuck zlati')
 else:
