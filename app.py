@@ -13,10 +13,8 @@ answer=st.number_input("колко е 4^3")
 if answer >= 64:
   st.success('правилно :D 1 т.')
   point = point + 1
-elif age < 18:
-  st.warning('няма да отивам в затвора')
-else :
-  st.write('come to pi didi ')
+elif answer != 64:
+  st.warning('грешен отговор 0 т. >:(')
 
 st.title("da / ne")
 answer = st.radio("обичаш ли програмиранет ",("да","не"))
