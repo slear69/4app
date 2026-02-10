@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("zdravei")
-age = st.number_input("ваведи години")
+age = st.number_input("ваведи години",min_value=0 , max_value=120)
 name = st.text_input("ваведи име")
 
 if st.button("краи"):
