@@ -10,7 +10,7 @@ if st.button("краи"):
 
 st.title("1 задача - 1т.")
 answer=st.number_input("колко е 4^3")
-if st.button('предаи')
+if st.button('предаи'):
     if answer >= 64:
        st.success('правилно :D 1 т.')
        point = point + 1
