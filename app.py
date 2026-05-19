@@ -82,70 +82,92 @@ def find_harmful_ingredients(text):
 
     harmful = {
 
-        # COLORANTS
-        "E102": "Оцветител",
-        "E104": "Оцветител",
-        "E110": "Оцветител",
-        "E122": "Оцветител",
-        "E123": "Оцветител",
-        "E127": "Оцветител",
-        "E131": "Оцветител",
-        "E133": "Оцветител",
-        "E151": "Оцветител",
+        # -------------------
+        # COLORANTS / ОЦВЕТИТЕЛИ
+        # -------------------
+        "E102": "Colorant / Оцветител (Tartrazine)",
+        "E104": "Colorant / Оцветител",
+        "E110": "Colorant / Оцветител (Sunset Yellow)",
+        "E122": "Colorant / Оцветител",
+        "E123": "Colorant / Оцветител",
+        "E124": "Colorant / Оцветител",
+        "E127": "Colorant / Оцветител",
+        "E129": "Colorant / Оцветител",
+        "E131": "Colorant / Оцветител",
+        "E133": "Colorant / Оцветител",
+        "E151": "Colorant / Оцветител",
 
-        # PRESERVATIVES
-        "E211": "Консервант",
-        "E220": "Консервант",
-        "E250": "Консервант",
+        # -------------------
+        # PRESERVATIVES / КОНСЕРВАНТИ
+        # -------------------
+        "E211": "Preservative / Консервант (Sodium benzoate)",
+        "E220": "Preservative / Консервант (Sulphites)",
+        "E221": "Preservative / Консервант",
+        "E222": "Preservative / Консервант",
+        "E223": "Preservative / Консервант",
+        "E224": "Preservative / Консервант",
+        "E225": "Preservative / Консервант",
+        "E226": "Preservative / Консервант",
+        "E227": "Preservative / Консервант",
+        "E228": "Preservative / Консервант",
+        "E250": "Preservative / Консервант (Sodium nitrite)",
 
-        # FLAVOR
-        "E621": "Овкусител",
-        "E631": "Овкусител",
-        "E635": "Овкусител",
+        # -------------------
+        # SWEETENERS / ПОДСЛАДИТЕЛИ
+        # -------------------
+        "E950": "Sweetener / Подсладител (Acesulfame K)",
+        "E951": "Sweetener / Подсладител (Aspartame / Аспартам)",
+        "E952": "Sweetener / Подсладител",
+        "E954": "Sweetener / Подсладител (Saccharin)",
+        "E955": "Sweetener / Подсладител (Sucralose)",
 
-        # SWEETENERS
-        "E950": "Подсладител",
-        "E951": "Аспартам",
-        "E952": "Подсладител",
-        "E954": "Подсладител",
+        # -------------------
+        # FLAVOR ENHANCERS / ОВКУСИТЕЛИ
+        # -------------------
+        "E621": "Flavor enhancer / Овкусител (MSG / Monosodium glutamate)",
+        "E627": "Flavor enhancer",
+        "E631": "Flavor enhancer",
+        "E635": "Flavor enhancer",
 
-        # STABILIZERS
-        "E407": "Стабилизатор",
-        "E410": "Стабилизатор",
-        "E412": "Стабилизатор",
-        "E415": "Стабилизатор",
-        "E450": "Стабилизатор",
+        # -------------------
+        # STABILIZERS / СТАБИЛИЗАТОРИ
+        # -------------------
+        "E320": "Antioxidant / Антиоксидант (BHA)",
+        "E321": "Antioxidant / Антиоксидант (BHT)",
+        "E407": "Stabilizer / Стабилизатор (Carrageenan)",
+        "E410": "Stabilizer",
+        "E412": "Stabilizer",
+        "E415": "Stabilizer",
+        "E450": "Stabilizer (Phosphates)",
 
-        # OTHER
-        "E300": "Антиоксидант",
-        "E330": "Киселинен регулатор",
-        "E262": "Консервант",
+        # -------------------
+        # OTHER HARMFUL INGREDIENTS / ДРУГИ
+        # -------------------
+        "palm oil": "Harmful fat / Палмово масло",
+        "палмово масло": "Harmful fat / Palm oil",
+
+        "hydrogenated oil": "Trans fat / Транс мазнини",
+        "partially hydrogenated": "Trans fat",
+
+        "high fructose corn syrup": "Sweetener / High fructose syrup",
+        "високо фруктозен сироп": "Sweetener",
+
+        "monosodium glutamate": "Flavor enhancer / MSG",
+        "мононатриев глутамат": "Flavor enhancer",
+
+        "aspartame": "Sweetener / Аспартам",
+        "аспартам": "Sweetener"
     }
 
     found = []
 
-    text = text.upper()
+    text = text.lower()
 
-    # FIX OCR BROKEN NUMBERS
-    text = text.replace("G", "E")
-    text = text.replace("[", "E")
-
-    # extract ALL E numbers even broken ones
-    matches = re.findall(r"E\s*\d{2,3}", text)
-
-    normalized = []
-
-    for m in matches:
-        num = re.sub(r"\D", "", m)
-        normalized.append(f"E{num}")
-
-    # check matches
-    for item in normalized:
-        if item in harmful:
-            found.append((item, harmful[item]))
+    for ingredient, category in harmful.items():
+        if ingredient.lower() in text:
+            found.append((ingredient, category))
 
     return found
-
 
 # ---------------------------
 # INPUTS
