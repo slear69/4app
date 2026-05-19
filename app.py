@@ -85,17 +85,62 @@ def extract_text(image):
 # ---------------------------
 
 def find_harmful_ingredients(text):
-    """
-    Search for harmful ingredients
-    """
+
+    harmful_ingredients = {
+
+        # COLORANTS
+        "E102": "Colorant",
+        "E104": "Colorant",
+        "E110": "Colorant",
+        "E122": "Colorant",
+        "E123": "Colorant",
+        "E127": "Colorant",
+        "E131": "Colorant",
+        "E133": "Colorant",
+        "E151": "Colorant",
+
+        # PRESERVATIVES
+        "E211": "Preservative",
+        "E250": "Preservative",
+        "E220": "Preservative",
+        "E221": "Preservative",
+        "E222": "Preservative",
+        "E223": "Preservative",
+        "E224": "Preservative",
+        "E225": "Preservative",
+        "E226": "Preservative",
+        "E227": "Preservative",
+        "E228": "Preservative",
+
+        # SWEETENERS & FLAVOR ENHANCERS
+        "E621": "Flavor Enhancer",
+        "E951": "Sweetener",
+        "E420": "Sweetener",
+
+        # STABILIZERS
+        "E320": "Stabilizer",
+        "E321": "Stabilizer",
+        "E407": "Stabilizer",
+        "E450": "Stabilizer",
+
+        # OTHER INGREDIENTS
+        "palm oil": "Harmful Oil",
+        "палмово масло": "Вредно масло",
+        "aspartame": "Sweetener",
+        "аспартам": "Подсладител",
+        "monosodium glutamate": "Flavor Enhancer",
+        "sodium nitrate": "Preservative",
+        "high fructose corn syrup": "Sweetener"
+    }
 
     found = []
 
     text = text.lower()
 
-    for ingredient in harmful_ingredients:
+    for ingredient, category in harmful_ingredients.items():
+
         if ingredient.lower() in text:
-            found.append(ingredient)
+            found.append((ingredient, category))
 
     return found
 
