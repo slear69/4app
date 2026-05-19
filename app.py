@@ -1,61 +1,20 @@
-# app.py
-
 import streamlit as st
 import easyocr
 import numpy as np
+import re
 from PIL import Image, ImageEnhance
 
 # ---------------------------
-# PAGE CONFIG
+# STREAMLIT UI
 # ---------------------------
 
-st.set_page_config(
-    page_title="Harmful Ingredients Scanner",
-    page_icon="⚠️",
-    layout="centered"
-)
+st.set_page_config(page_title="Скенер за добавки", page_icon="⚠️")
 
-st.title("⚠️ Harmful Ingredients Scanner")
-st.write("Upload a food label image or take a photo.")
+st.title("⚠️ Скенер за вредни добавки")
+st.write("Качи снимка или използвай камера.")
 
 # ---------------------------
-# HARMFUL INGREDIENTS LIST
-# ---------------------------
-
-harmful_ingredients = [
-    "e621",
-    "e951",
-    "palm oil",
-    "палмово масло",
-    "aspartame",
-    "аспартам",
-    "monosodium glutamate",
-    "sodium nitrate",
-    "high fructose corn syrup"
-]
-
-# ---------------------------
-# IMAGE PREPROCESSING
-# ---------------------------
-
-def preprocess_image(image):
-    """
-    Improve image quality for OCR
-    """
-
-    # Increase contrast
-    contrast = ImageEnhance.Contrast(image)
-    image = contrast.enhance(2)
-
-    # Increase sharpness
-    sharpness = ImageEnhance.Sharpness(image)
-    image = sharpness.enhance(2)
-
-    return image
-
-
-# ---------------------------
-# OCR FUNCTION
+# OCR READER
 # ---------------------------
 
 @st.cache_resource
@@ -63,185 +22,176 @@ def load_reader():
     return easyocr.Reader(['bg', 'en'])
 
 
-def extract_text(image):
-    """
-    Extract text using EasyOCR
-    """
+# ---------------------------
+# IMAGE PREPROCESSING
+# ---------------------------
 
-    reader = load_reader()
+def preprocess_image(image):
 
-    # Convert image to numpy array
-    image_array = np.array(image)
+    image = image.convert("RGB")
 
-    results = reader.readtext(image_array)
+    # increase contrast
+    image = ImageEnhance.Contrast(image).enhance(2)
 
-    extracted_text = " ".join([result[1] for result in results])
+    # sharpen
+    image = ImageEnhance.Sharpness(image).enhance(2)
 
-    return extracted_text
+    return image
 
 
 # ---------------------------
-# FIND HARMFUL INGREDIENTS
+# FIX OCR TEXT (VERY IMPORTANT)
+# ---------------------------
+
+def clean_ocr_text(text):
+
+    text = text.upper()
+
+    # OCR fixes
+    text = text.replace("G", "E")
+    text = text.replace("[", "E")
+    text = text.replace("O", "0")
+
+    text = re.sub(r"\s+", " ", text)
+
+    return text
+
+
+# ---------------------------
+# OCR FUNCTION
+# ---------------------------
+
+def extract_text(image):
+
+    reader = load_reader()
+
+    img_array = np.array(image)
+
+    results = reader.readtext(img_array)
+
+    text = " ".join([r[1] for r in results])
+
+    return clean_ocr_text(text)
+
+
+# ---------------------------
+# DETECTOR (FIXED + ROBUST)
 # ---------------------------
 
 def find_harmful_ingredients(text):
 
-    harmful_ingredients = {
+    harmful = {
 
-        # -------------------
-        # COLORANTS / ОЦВЕТИТЕЛИ
-        # -------------------
-        "E102": "Colorant / Оцветител (Tartrazine)",
-        "E104": "Colorant / Оцветител",
-        "E110": "Colorant / Оцветител (Sunset Yellow)",
-        "E122": "Colorant / Оцветител (Azorubine)",
-        "E123": "Colorant / Оцветител",
-        "E124": "Colorant / Оцветител (Ponceau 4R)",
-        "E127": "Colorant / Оцветител",
-        "E129": "Colorant / Оцветител (Allura Red)",
-        "E131": "Colorant / Оцветител",
-        "E132": "Colorant / Оцветител",
-        "E133": "Colorant / Оцветител (Blue)",
-        "E142": "Colorant / Оцветител",
-        "E151": "Colorant / Оцветител (Black PN)",
+        # COLORANTS
+        "E102": "Оцветител",
+        "E104": "Оцветител",
+        "E110": "Оцветител",
+        "E122": "Оцветител",
+        "E123": "Оцветител",
+        "E127": "Оцветител",
+        "E131": "Оцветител",
+        "E133": "Оцветител",
+        "E151": "Оцветител",
 
-        # -------------------
-        # PRESERVATIVES / КОНСЕРВАНТИ
-        # -------------------
-        "E200": "Preservative / Консервант",
-        "E202": "Preservative / Консервант",
-        "E211": "Preservative / Консервант (Sodium benzoate)",
-        "E220": "Preservative / Консервант (Sulphites)",
-        "E221": "Preservative / Консервант",
-        "E222": "Preservative / Консервант",
-        "E223": "Preservative / Консервант",
-        "E224": "Preservative / Консервант",
-        "E225": "Preservative / Консервант",
-        "E226": "Preservative / Консервант",
-        "E227": "Preservative / Консервант",
-        "E228": "Preservative / Консервант",
-        "E250": "Preservative / Консервант (Sodium nitrite)",
-        "E251": "Preservative / Консервант (Nitrate)",
-        "E252": "Preservative / Консервант",
+        # PRESERVATIVES
+        "E211": "Консервант",
+        "E220": "Консервант",
+        "E250": "Консервант",
 
-        # -------------------
-        # SWEETENERS / ПОДСЛАДИТЕЛИ
-        # -------------------
-        "E420": "Sweetener / Подсладител (Sorbitol)",
-        "E421": "Sweetener / Подсладител",
-        "E950": "Sweetener / Подсладител (Acesulfame K)",
-        "E951": "Sweetener / Подсладител (Aspartame)",
-        "E952": "Sweetener / Подсладител (Cyclamate)",
-        "E954": "Sweetener / Подсладител (Saccharin)",
-        "E955": "Sweetener / Подсладител (Sucralose)",
+        # FLAVOR
+        "E621": "Овкусител",
+        "E631": "Овкусител",
+        "E635": "Овкусител",
 
-        # -------------------
-        # FLAVOR ENHANCERS / ОВКУСИТЕЛИ
-        # -------------------
-        "E621": "Flavor enhancer / Овкусител (MSG)",
-        "E627": "Flavor enhancer / Овкусител",
-        "E631": "Flavor enhancer / Овкусител",
-        "E635": "Flavor enhancer / Овкусител",
+        # SWEETENERS
+        "E950": "Подсладител",
+        "E951": "Аспартам",
+        "E952": "Подсладител",
+        "E954": "Подсладител",
 
-        # -------------------
-        # STABILIZERS / СТАБИЛИЗАТОРИ
-        # -------------------
-        "E320": "Stabilizer / Стабилизатор (BHA)",
-        "E321": "Stabilizer / Стабилизатор (BHT)",
-        "E407": "Stabilizer / Стабилизатор (Carrageenan)",
-        "E410": "Stabilizer / Стабилизатор",
-        "E412": "Stabilizer / Стабилизатор",
-        "E415": "Stabilizer / Стабилизатор",
-        "E440": "Stabilizer / Стабилизатор",
-        "E450": "Stabilizer / Стабилизатор (Phosphates)",
+        # STABILIZERS
+        "E407": "Стабилизатор",
+        "E410": "Стабилизатор",
+        "E412": "Стабилизатор",
+        "E415": "Стабилизатор",
+        "E450": "Стабилизатор",
 
-        # -------------------
-        # OTHER HARMFUL / спорни съставки
-        # -------------------
-        "palm oil": "Harmful fat / Палмово масло",
-        "палмово масло": "Вредна мазнина / Палмово масло",
-
-        "hydrogenated oil": "Trans fat / Хидрогенирано масло",
-        "частично хидрогенирано": "Trans fat / Транс мазнини",
-
-        "high fructose corn syrup": "Sweetener / Високо фруктозен сироп",
-        "високо фруктозен сироп": "Sweetener / High fructose syrup",
-
-        "monosodium glutamate": "Flavor enhancer / Мононатриев глутамат",
-        "мононатриев глутамат": "Flavor enhancer / MSG",
-
-        "aspartame": "Sweetener / Аспартам",
-        "аспартам": "Sweetener / Аспартам",
-
-        "glucose-fructose syrup": "Sweetener / Глюкозо-фруктозен сироп",
-        "глюкозо-фруктозен сироп": "Sweetener / Glucose-fructose syrup"
+        # OTHER
+        "E300": "Антиоксидант",
+        "E330": "Киселинен регулатор",
+        "E262": "Консервант",
     }
 
     found = []
 
-    text = text.lower()
+    text = text.upper()
 
-    for ingredient, category in harmful_ingredients.items():
-        if ingredient.lower() in text:
-            found.append((ingredient, category))
+    # FIX OCR BROKEN NUMBERS
+    text = text.replace("G", "E")
+    text = text.replace("[", "E")
+
+    # extract ALL E numbers even broken ones
+    matches = re.findall(r"E\s*\d{2,3}", text)
+
+    normalized = []
+
+    for m in matches:
+        num = re.sub(r"\D", "", m)
+        normalized.append(f"E{num}")
+
+    # check matches
+    for item in normalized:
+        if item in harmful:
+            found.append((item, harmful[item]))
 
     return found
 
+
 # ---------------------------
-# IMAGE INPUT
+# INPUTS
 # ---------------------------
 
-uploaded_file = st.file_uploader(
-    "📤 Upload an image",
-    type=["jpg", "jpeg", "png"]
-)
-
-camera_image = st.camera_input("📷 Take a photo")
+uploaded = st.file_uploader("📤 Качи снимка", type=["png", "jpg", "jpeg"])
+camera = st.camera_input("📷 Камера")
 
 image = None
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
+if uploaded:
+    image = Image.open(uploaded)
 
-elif camera_image is not None:
-    image = Image.open(camera_image)
+elif camera:
+    image = Image.open(camera)
+
 
 # ---------------------------
-# PROCESS IMAGE
+# MAIN LOGIC
 # ---------------------------
 
-if image is not None:
+if image:
 
-    st.image(image, caption="Selected Image", use_container_width=True)
+    st.image(image, caption="Снимка", use_container_width=True)
 
-    with st.spinner("🔍 Scanning label..."):
+    processed = preprocess_image(image)
 
-        # Preprocess image
-        processed_image = preprocess_image(image)
+    with st.spinner("🔍 Сканиране..."):
 
-        # OCR
-        extracted_text = extract_text(processed_image)
+        text = extract_text(processed)
 
-        # Find ingredients
-        detected = find_harmful_ingredients(extracted_text)
+        results = find_harmful_ingredients(text)
 
-    # ---------------------------
-    # SHOW RESULTS
-    # ---------------------------
+    st.subheader("📝 Разпознат текст")
 
-    st.subheader("📝 Extracted Text")
+    with st.expander("Покажи текста"):
+        st.write(text)
 
-    with st.expander("Show OCR Text"):
-        st.write(extracted_text)
+    st.subheader("⚠️ Резултати")
 
-    st.subheader("⚠️ Analysis Result")
+    if results:
 
-    if detected:
+        st.error("Открити са вредни добавки!")
 
-        st.warning("Harmful ingredients detected!")
-
-        for item in detected:
-            st.error(f"❌ {item}")
+        for e, name in results:
+            st.warning(f"❌ {e} → {name}")
 
     else:
-        st.success("✅ No harmful ingredients found.")
+        st.success("✅ Няма открити вредни добавки")
